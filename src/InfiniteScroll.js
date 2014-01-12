@@ -28,7 +28,9 @@
         var $window = $(window);
         var scrollTop = $window.scrollTop();
         var numberOfRowsHidden = Math.floor(scrollTop / me.itemHeight);
-        $element.css({ 'padding-top': (numberOfRowsHidden * me.itemHeight) + 'px' });
+        var currentHeight = $element.height();
+        $element.css({ 'padding-top': (numberOfRowsHidden * me.itemHeight) + 'px' })
+            .height(currentHeight - (numberOfRowsHidden * me.itemHeight));
         var rowsToDisplay = Math.ceil($window.height() / me.itemHeight) + 2;
         var start = numberOfRowsHidden * me.numberOfItemsInRow;
         var end = start + (rowsToDisplay * me.numberOfItemsInRow) + 1;
@@ -67,7 +69,7 @@
         $(window).resize(function () {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function () {
-                me.calculateLayou(element, valueAccessor, allBindings, viewModel, bindingContext);
+                me.calculateLayout(element, valueAccessor, allBindings, viewModel, bindingContext);
                 me.displayView(element, valueAccessor, allBindings, viewModel, bindingContext);
             }, 400);
         });
