@@ -33,7 +33,7 @@
             .height(currentHeight - (numberOfRowsHidden * me.itemHeight));
         var rowsToDisplay = Math.ceil($window.height() / me.itemHeight) + 2;
         var start = numberOfRowsHidden * me.numberOfItemsInRow;
-        var end = start + (rowsToDisplay * me.numberOfItemsInRow) + 1;
+        var end = start + (rowsToDisplay * me.numberOfItemsInRow);
         ko.bindingHandlers['template']['update'](element, me.makeValueAccessor(valueAccessor, start, end), allBindings, viewModel, bindingContext);
     },
     'calculateLayout': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
