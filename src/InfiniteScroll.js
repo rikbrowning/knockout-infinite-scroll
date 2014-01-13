@@ -17,8 +17,7 @@
                 'beforeRemove': unwrappedValue['beforeRemove'],
                 'afterRender': unwrappedValue['afterRender'],
                 'beforeMove': unwrappedValue['beforeMove'],
-                'afterMove': unwrappedValue['afterMove'],
-                'templateEngine': ko.nativeTemplateEngine.instance
+                'afterMove': unwrappedValue['afterMove']
             };
         }
     },
@@ -28,9 +27,8 @@
         var $window = $(window);
         var scrollTop = $window.scrollTop();
         var numberOfRowsHidden = Math.floor(scrollTop / me.itemHeight);
-        var currentHeight = $element.height();
-        $element.css({ 'padding-top': (numberOfRowsHidden * me.itemHeight) + 'px' })
-            .height(currentHeight - (numberOfRowsHidden * me.itemHeight));
+        
+        $element.css({ 'padding-top': (numberOfRowsHidden * me.itemHeight) + 'px' });
         var rowsToDisplay = Math.ceil($window.height() / me.itemHeight) + 2;
         var start = numberOfRowsHidden * me.numberOfItemsInRow;
         var end = start + (rowsToDisplay * me.numberOfItemsInRow);
@@ -42,17 +40,20 @@
         var $element = $(element);
         var data = ko.utils.unwrapObservable(options.data);
 
-        $element.empty();
-        ko.bindingHandlers['template']['update'](element, me.makeValueAccessor(valueAccessor, 0, 1), allBindings, viewModel, bindingContext);
+        //if there is children they should be ok size wise so we can just go ahead.
+        if ($element.children().length === 0)
+            ko.bindingHandlers['template']['update'](element, me.makeValueAccessor(valueAccessor, 0, 1), allBindings, viewModel, bindingContext);
         var item = $element.children().eq(0);
         me.itemHeight = item.outerHeight(true);
         var itemWidth = item.outerWidth(true);
         var screenWidth = $element.width();
 
-        $element.empty();
         me.numberOfItemsInRow = Math.floor(screenWidth / itemWidth);
         var numberOfRows = Math.ceil(data.length / me.numberOfItemsInRow);
-        $element.height(me.itemHeight * numberOfRows);
+        //jquery keeps adding in the padding to the height, we dont want that
+        var padding = $element.css('padding-top');
+        $element.css({ 'padding-top': '0px', 'box-sizing': 'border-box' })
+            .height(me.itemHeight * numberOfRows).css({ 'padding-top': padding });
     },
     'init': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         var me = ko.bindingHandlers['infiniteScroll'];
@@ -71,7 +72,7 @@
             resizeTimeout = setTimeout(function () {
                 me.calculateLayout(element, valueAccessor, allBindings, viewModel, bindingContext);
                 me.displayView(element, valueAccessor, allBindings, viewModel, bindingContext);
-            }, 400);
+            }, 250);
         });
 
 
@@ -83,11 +84,10 @@
         var me = ko.bindingHandlers['infiniteScroll'];
         var options = ko.utils.unwrapObservable(valueAccessor());
         var data = ko.utils.unwrapObservable(options.data);
-        if (data.length > 0 && me.numberOfItemsInRow === -1) {
+        if (data.length > 0) {
             me.calculateLayout(element, valueAccessor, allBindings, viewModel, bindingContext);
-
+            me.displayView(element, valueAccessor, allBindings, viewModel, bindingContext);
         }
-        me.displayView(element, valueAccessor, allBindings, viewModel, bindingContext);
     }
 };
 ko.expressionRewriting.bindingRewriteValidators['infiniteScroll'] = false; // Can't rewrite control flow bindings
