@@ -25,7 +25,7 @@
         var me = ko.bindingHandlers['infiniteScroll'];
         var $element = $(element);
         var $window = $(window);
-        var scrollTop = $window.scrollTop();
+        var scrollTop = Math.max($window.scrollTop() - $element.offset().top, 0);
         var numberOfRowsHidden = Math.floor(scrollTop / me.itemHeight);
         
         $element.css({ 'padding-top': (numberOfRowsHidden * me.itemHeight) + 'px' });
